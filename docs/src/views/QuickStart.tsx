@@ -16,8 +16,8 @@ export default () => (
     <CodeSnippet mode="sh" value="yarn add @stardust-ui/react" />
     <Header as="h2">Setup</Header>
     <p>
-      Stardust components are styled using CSS in JS. This technique requires a style renderer to
-      render JavaScript objects to CSS.{' '}
+      Stardust components are styled using <NavLink to="css-in-js">CSS in JS</NavLink>. This
+      technique requires a style renderer to render JavaScript objects to CSS.{' '}
       <a href="https://reactjs.org/docs/context.html" target="_blank" rel="noopener nofollow">
         React Context <Icon name="external" size="small" link fitted />
       </a>{' '}
@@ -53,7 +53,7 @@ export default () => (
         `import { Button } from '@stardust-ui/react'`,
         ``,
         `export default () => (`,
-        `  <Button type="primary" content="Docs" icon="arrow right" iconPosition="after" />`,
+        `  <Button type="primary" content="Theming" icon="arrow right" iconPosition="after" />`,
         `)`,
       ].join('\n')}
     />
@@ -61,11 +61,11 @@ export default () => (
     {/* Show a preview of the above snippet */}
     <Button
       as={NavLink}
-      content="Docs"
+      content="Theming"
       type="primary"
       icon="arrow right"
       iconPosition="after"
-      to="components/button"
+      to="theming"
     />
   </DocPage>
 )

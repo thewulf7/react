@@ -190,14 +190,31 @@ class Sidebar extends React.Component<any, any> {
             </Menu.Item>
           </Menu.Menu>
         </Menu.Item>
-        <Menu.Item as={NavLink} exact to="/" activeClassName="active">
-          Introduction
+        <Menu.Item>
+          Concepts
+          <Menu.Menu>
+            <Menu.Item as={NavLink} exact to="/" activeClassName="active">
+              Introduction
+            </Menu.Item>
+            <Menu.Item as={NavLink} exact to="/component-anatomy" activeClassName="active">
+              Component Anatomy
+            </Menu.Item>
+            <Menu.Item as={NavLink} exact to="/shorthand" activeClassName="active">
+              Shorthand
+            </Menu.Item>
+            <Menu.Item as={NavLink} exact to="/css-in-js" activeClassName="active">
+              CSS in JS
+            </Menu.Item>
+          </Menu.Menu>
         </Menu.Item>
         <Menu.Item>
           Guides
           <Menu.Menu>
             <Menu.Item as={NavLink} exact to="/quick-start" activeClassName="active">
               Quick Start
+            </Menu.Item>
+            <Menu.Item as={NavLink} exact to="/theming" activeClassName="active">
+              Theming
             </Menu.Item>
           </Menu.Menu>
         </Menu.Item>

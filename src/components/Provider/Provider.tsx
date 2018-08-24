@@ -130,7 +130,9 @@ class Provider extends React.Component<IProviderProps, any> {
 
           return (
             <RendererProvider renderer={outgoingTheme.renderer} {...{ rehydrate: false }}>
-              <ThemeProvider theme={outgoingTheme}>{children}</ThemeProvider>
+              <ThemeProvider theme={outgoingTheme}>
+                <React.Fragment>{children}</React.Fragment>
+              </ThemeProvider>
             </RendererProvider>
           )
         }}
