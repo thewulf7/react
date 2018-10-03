@@ -16,6 +16,7 @@ import { Extendable, ItemShorthand, ReactChildren } from '../../../types/utils'
 
 export interface IMenuProps {
   accessibility?: Accessibility
+  createItem?: (Component: React.ReactType, props: any, children: any) => React.ReactElement<any>
   as?: any
   activeIndex?: number | string
   children?: ReactChildren
@@ -121,6 +122,7 @@ class Menu extends AutoControlledComponent<Extendable<IMenuProps>, any> {
 
     return _.map(items, (item, index) =>
       MenuItem.create(item, {
+        createElement: this.props.createItem,
         defaultProps: {
           iconOnly,
           pills,

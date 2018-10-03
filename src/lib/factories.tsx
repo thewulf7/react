@@ -17,6 +17,13 @@ type ShorthandValue = Primitive | IProps | React.ReactElement<IProps> | Shorthan
 type MapValueToProps = (value: Primitive) => IProps
 
 interface ICreateShorthandOptions {
+  /** Override the default createElement. */
+  createElement?: (
+    Component: React.ReactType,
+    props: IProps,
+    children: any,
+  ) => React.ReactElement<any>
+
   /** Default props object */
   defaultProps?: IProps
 
@@ -119,6 +126,10 @@ export function createShorthand(
   // ----------------------------------------
   // Create Element
   // ----------------------------------------
+
+  if (options.createElement) {
+    return options.createElement(Component, props, props.children)
+  }
 
   // Clone ReactElements
   if (valIsReactElement) return React.cloneElement(value as React.ReactElement<IProps>, props)

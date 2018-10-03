@@ -233,6 +233,9 @@ class Sidebar extends React.Component<any, any> {
                 <Menu.Item as={NavLink} exact to="/theming-examples" activeClassName="active">
                   Theming Examples
                 </Menu.Item>
+                <Menu.Item as={NavLink} exact to="/extending-props" activeClassName="active">
+                  Extending Props
+                </Menu.Item>
               </Menu.Menu>
             </Menu.Item>
             {process.env.NODE_ENV !== 'production' && (
@@ -241,6 +244,14 @@ class Sidebar extends React.Component<any, any> {
                 <Menu.Menu>
                   <Menu.Item as={NavLink} exact to="/prototype-chat-pane" activeClassName="active">
                     Chat Pane
+                  </Menu.Item>
+                  <Menu.Item
+                    as={NavLink}
+                    exact
+                    to="/prototype-async-shorthand"
+                    activeClassName="active"
+                  >
+                    Async Shorthand
                   </Menu.Item>
                 </Menu.Menu>
               </Menu.Item>
