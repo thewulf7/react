@@ -1,8 +1,3 @@
-- [ ] Recap vision and flow into how current effort implementing it?
-- [ ] How does this interplay with Teams' current short term goals? How are the two serving each other? What needs to happen now and next?
-
--------------------------------------------------------------------
-
 # Vision
 
 ## Problems
