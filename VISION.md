@@ -61,7 +61,21 @@ The exemplar React bindings, demonstrating the implementation of the specs using
 
 ## Deliverables
 
-### Styles
+### Docs
+
+A doc experience for each scope: state, style, accessibility, and specifications.
+
+### Specifications
+
+- Show list of components, their slots, and a list of sources supporting the component names and slot names.
+- Show what states the component supports, link frameworks and guides supporting the decisions.
+  - State spec go here and implementation goes in the state docs
+
+#### State
+- Show a code editor with the state manager powering React, Vue, and plain HTML controls.
+- Show a plain JSON output.
+
+### Style
 
 Provide CSS in JS styles
 
@@ -72,3 +86,8 @@ Provide flat style sheets
   - class name generator function (from props)
   - enable consumers to use "class name build up" to implement styles (e.g. HTML, vuejs, angular, React w/o CSS in JS, etc.)
 
+#### Accessibility
+
+Show a code editor with the accessibility abstraction powering React, Vue, and plain HTML controls.
+
+Show a plain JSON output.
