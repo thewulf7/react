@@ -5,7 +5,7 @@ import Variations from './Variations'
 const PopupExamples = () => (
   <div>
     <Types />
-    <Variations />
+    {/*<Variations />*/}
   </div>
 )
 

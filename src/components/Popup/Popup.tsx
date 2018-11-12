@@ -7,16 +7,16 @@ import { Popper, PopperChildrenProps } from 'react-popper'
 import {
   childrenExist,
   customPropTypes,
-  AutoControlledComponent,
   EventStack,
-  RenderResultConfig,
   isBrowser,
+  RenderResultConfig,
+  UIComponent,
 } from '../../lib'
 import {
   ComponentEventHandler,
-  ShorthandValue,
   Extendable,
   ReactChildren,
+  ShorthandValue,
 } from '../../../types/utils'
 
 import Ref from '../Ref/Ref'
@@ -30,6 +30,7 @@ import {
   AccessibilityActionHandlers,
   AccessibilityBehavior,
 } from '../../lib/accessibility/types'
+import createPopupManager from '../../../state/createPopupManager'
 
 const POSITIONS: Position[] = ['above', 'below', 'before', 'after']
 const ALIGNMENTS: Alignment[] = ['top', 'bottom', 'start', 'end', 'center']
@@ -50,8 +51,41 @@ export interface PopupProps {
 }
 
 export interface PopupState {
-  open: boolean
-  target: HTMLElement
+  open?: boolean
+  target?: HTMLElement
+}
+
+// TODO: notes here on how to make auto controlled updates independent of the instance
+// const acProps = []
+// const mgr = {}
+//
+// const acMangerUpdate = (mgr, acProps, props) => {
+//   // get curr state
+//   // return filtered state (per acProps in props)
+// }
+
+const autoControlledMiddleware = ({ autoControlledProps, getProps }) => (prevState, nextState) => {
+  const props = getProps()
+  // filter out state updates for props that are controlled by the user
+  const filteredState = autoControlledProps.reduce((acc, next) => {
+    if (props[next] !== undefined) {
+      console.log('copying defined prop to state:', {
+        propName: next,
+        propValue: props[next],
+      })
+      acc[next] = props[next]
+    }
+
+    return acc
+  }, nextState)
+
+  console.log('autoControlledMiddleware', {
+    autoControlledProps,
+    props,
+    filteredState,
+  })
+
+  return filteredState
 }
 
 /**
@@ -59,7 +93,38 @@ export interface PopupState {
  * @accessibility This is example usage of the accessibility tag.
  * This should be replaced with the actual description after the PR is merged
  */
-export default class Popup extends AutoControlledComponent<Extendable<PopupProps>, PopupState> {
+export default class Popup extends UIComponent<Extendable<PopupProps>, PopupState> {
+  manager = createPopupManager({
+    state: { target: null },
+    actions: {
+      // TODO: fix typings, don't require init from user
+      init: () => () => null,
+
+      setTarget: target => () => ({ target }),
+    },
+
+    // some action has been called (e.g. actions.open())
+    // prevState is state before action was called
+    // nextState is state after action was called, but before it was applied
+    // actions.open()
+    middleware: [
+      autoControlledMiddleware({
+        autoControlledProps: ['open', 'target'],
+        getProps: (props = this.props) => props,
+      }),
+    ],
+
+    sideEffects: [
+      // TODO: provide common state middleware
+      // TODO: in the /react package? setState() middleware is a React binding...
+      (manager, next) => {
+        this.setState(manager.state)
+
+        next()
+      },
+    ],
+  })
+
   public static displayName = 'Popup'
 
   public static className = 'ui-popup'
@@ -117,13 +182,12 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
     trigger: PropTypes.any,
   }
 
+  // TODO: implement defaults for auto controlled values
   public static defaultProps: PopupProps = {
     accessibility: popupBehavior,
     align: 'start',
     position: 'above',
   }
-
-  public static autoControlledProps = ['open', 'target']
 
   private static isBrowserContext = isBrowser()
 
@@ -134,14 +198,28 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
 
   protected actionHandlers: AccessibilityActionHandlers = {
     toggle: e => {
-      this.trySetOpen(!this.state.open, e, true)
+      this.trySetOpen(!this.state.open, e)
     },
     closeAndFocusTrigger: e => this.closeAndFocusTrigger(e),
   }
 
+  // TODO
+  // TODO: How to allow auto controlling state from "next" props
+  // TODO
+  // static getDerivedStateFromProps(props, state) {
+  //   // allow calling middleware directly :S
+  //   // props.manager.middleware[0]({props})
+  //
+  //   // allow setting / resetting state directly :S
+  //   // props.manager.setSomeState(props)
+  // }
+
   private closeAndFocusTrigger = e => {
+    console.log('closeAndFocusTrigger')
+    this.trySetOpen(false, e)
+
+    // TODO: unsafe, open could change async.  don't assume it is update....
     if (this.state.open) {
-      this.trySetOpen(false, e, true)
       _.invoke(this.triggerDomElement, 'focus')
     }
   }
@@ -151,6 +229,7 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
 
     if (this.state.open) {
       setTimeout(() => {
+        console.log('updateOutsideClickSubscription')
         this.outsideClickSubscription = EventStack.subscribe('click', e => {
           if (!this.popupDomElement || !this.popupDomElement.contains(e.target)) {
             this.closeAndFocusTrigger(e)
@@ -160,7 +239,10 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
     }
   }
 
-  public state = { target: undefined, open: false }
+  public state = {
+    target: undefined,
+    ...this.manager.state,
+  }
 
   public componentDidMount() {
     this.updateOutsideClickSubscription()
@@ -184,6 +266,8 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
 
   public renderComponent({ rtl, accessibility }: RenderResultConfig<PopupProps>): React.ReactNode {
     const popupContent = this.renderPopupContent(rtl, accessibility)
+    console.log('POPUP state.open', this.state.open)
+    console.log('POPUP props.open', this.props.open)
 
     return (
       <>
@@ -205,7 +289,9 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
       triggerElement && (
         <Ref
           innerRef={domNode => {
-            this.trySetState({ target: domNode })
+            this.manager.actions.setTarget(domNode)
+            // TODO: how to handle this in the state abstraction?
+            // this.trySetState({ target: domNode })
             this.triggerDomElement = domNode
           }}
         >
@@ -265,9 +351,16 @@ export default class Popup extends AutoControlledComponent<Extendable<PopupProps
     )
   }
 
-  private trySetOpen(newValue: boolean, eventArgs: any, forceChangeEvent: boolean = false) {
-    if (this.trySetState({ open: newValue }) || forceChangeEvent) {
-      _.invoke(this.props, 'onOpenChange', eventArgs, { ...this.props, ...{ open: newValue } })
+  private trySetOpen(newValue: boolean, eventArgs: any) {
+    _.invoke(this.props, 'onOpenChange', eventArgs, {
+      ...this.props,
+      ...{ open: newValue },
+    })
+
+    if (newValue) {
+      this.manager.actions.open()
+    } else {
+      this.manager.actions.close()
     }
   }
 }
