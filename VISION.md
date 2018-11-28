@@ -66,6 +66,34 @@ A doc experience for each scope: state, style, accessibility, and specifications
 - Show what states the component supports, link frameworks and guides supporting the decisions.
   - State spec go here and implementation goes in the state docs
 
+#### Specification Development Tool
+
+Website for defining and exploring UI design language.
+
+Allows contributions from the community
+- submit proposed component name, slot, and design terms
+- submitting UI images
+- provide list of references or resources
+
+Use MDX files stored on GitHub and presented in a website:
+- include images of UI that is being specified
+- include table of references to frameworks / design guides
+- include list of component names, slots, and design terms
+- include clear link to edit
+
+#### TODO
+
+Scaffold out potential spec page for a few simple components:
+
+Levi - Divider
+Roman - Segment
+Mira - Icon
+
+Shift - Get MDX flow
+
+GOAL - not to properly specify the component, but figure out what the specification page and process looks like.
+
+
 #### State
 - Show a code editor with the state manager powering React, Vue, and plain HTML controls.
 - Show a plain JSON output.
