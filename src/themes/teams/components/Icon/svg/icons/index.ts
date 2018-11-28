@@ -11,6 +11,9 @@ import callStartPresenting from './callControlPresentNew'
 import callStopPresenting from './callControlStopPresentingNew'
 import callMicrophone from './callMicrophone'
 import callMicrophoneOff from './callMicrophoneOff'
+import caretDownSolid from './caretDownSolid'
+import caretLeftSolid from './caretLeftSolid'
+import caretRightSolid from './caretRightSolid'
 import gallery from './gallery'
 import menu from './menu'
 import more from './more'
@@ -35,6 +38,9 @@ export default {
   'call-stop-presenting': callStopPresenting,
   'call-microphone': callMicrophone,
   'call-microphone-off': callMicrophoneOff,
+  'caret-down-solid': caretDownSolid,
+  'caret-left-solid': caretLeftSolid,
+  'caret-right-solid': caretRightSolid,
   gallery,
   menu,
   more,

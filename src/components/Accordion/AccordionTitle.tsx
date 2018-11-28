@@ -2,8 +2,8 @@ import * as _ from 'lodash'
 import * as PropTypes from 'prop-types'
 import * as React from 'react'
 
-import { childrenExist, createShorthandFactory, UIComponent } from '../../lib'
-import { Extendable, ComponentEventHandler } from '../../../types/utils'
+import { childrenExist, createShorthandFactory, UIComponent, customPropTypes } from '../../lib'
+import { Extendable, ComponentEventHandler, ShorthandValue } from '../../../types/utils'
 import {
   UIComponentProps,
   ContentComponentProps,
@@ -14,6 +14,7 @@ import {
   childrenComponentPropTypes,
   contentComponentPropsTypes,
 } from '../../lib/commonPropTypes'
+import Icon from '../Icon/Icon'
 
 export interface AccordionTitleProps
   extends UIComponentProps<any, any>,
@@ -21,6 +22,12 @@ export interface AccordionTitleProps
     ChildrenComponentProps {
   /** Whether or not the title is in the open state. */
   active?: boolean
+
+  /** Shorthand of props for opened and closed icons. */
+  icons?: {
+    opened: ShorthandValue
+    closed: ShorthandValue
+  }
 
   /** AccordionTitle index inside Accordion. */
   index?: string | number
@@ -49,16 +56,33 @@ class AccordionTitle extends UIComponent<Extendable<AccordionTitleProps>, any> {
     ...childrenComponentPropTypes,
     ...contentComponentPropsTypes,
     active: PropTypes.bool,
+    panels: customPropTypes.every([
+      customPropTypes.disallow(['children']),
+      PropTypes.arrayOf(
+        PropTypes.shape({
+          opened: customPropTypes.itemShorthand,
+          closed: customPropTypes.itemShorthand,
+        }),
+      ),
+    ]),
     index: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     onClick: PropTypes.func,
   }
 
-  handleClick = e => {
+  private handleClick = e => {
     _.invoke(this.props, 'onClick', e, this.props)
   }
 
-  renderComponent({ ElementType, classes, rest }) {
-    const { active, children, content } = this.props
+  renderComponent({ ElementType, classes, rtl, rest }) {
+    const {
+      active,
+      children,
+      content,
+      icons = {
+        opened: 'caret-down-solid',
+        closed: rtl ? 'caret-left-solid' : 'caret-right-solid',
+      },
+    } = this.props
 
     if (childrenExist(children)) {
       return (
@@ -70,7 +94,7 @@ class AccordionTitle extends UIComponent<Extendable<AccordionTitleProps>, any> {
 
     return (
       <ElementType {...rest} className={classes.root} onClick={this.handleClick}>
-        {active ? <span>&#9660;</span> : <span>&#9654;</span>}
+        {Icon.create(active ? icons.opened : icons.closed)}
         {content}
       </ElementType>
     )
