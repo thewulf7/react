@@ -31,6 +31,12 @@ const Router = () => (
           />,
           <DocsLayout
             exact
+            key="/prototype-left-rail"
+            path="/prototype-left-rail"
+            component={require('./prototypes/leftRail/index').default}
+          />,
+          <DocsLayout
+            exact
             key="/prototype-async-shorthand"
             path="/prototype-async-shorthand"
             component={require('./prototypes/AsyncShorthand/index').default}
