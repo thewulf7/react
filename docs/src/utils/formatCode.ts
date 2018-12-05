@@ -13,7 +13,6 @@ const formatCode = (code, parser = 'babylon') => {
 
   const formatted = prettier.format(code, {
     ...prettierConfig,
-    // a narrower print width is more friendly to doc examples
     parser,
     plugins: window.prettierPlugins,
   })

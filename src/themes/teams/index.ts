@@ -35,6 +35,20 @@ Object.keys(fontIcons).forEach(iconName => {
 })
 
 export default {
+  animations: {
+    spinner: {
+      keyframe: {
+        from: {
+          transform: 'rotate(0deg)',
+        },
+        to: {
+          transform: 'rotate(360deg)',
+        },
+      },
+      duration: '1s',
+      iterationCount: 'infinite',
+    },
+  },
   siteVariables,
   componentVariables,
   componentStyles,

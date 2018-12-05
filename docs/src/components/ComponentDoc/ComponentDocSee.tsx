@@ -11,6 +11,8 @@ const listStyle = { display: 'block' }
 const ComponentDocSee: any = ({ displayName }) => {
   const items = getInfoForSeeTags(displayName)
 
+  if (_.isEmpty(items)) return null
+
   return (
     <List horizontal link size="small" style={listStyle}>
       {/* Heads up! Still render empty lists to reserve the whitespace */}

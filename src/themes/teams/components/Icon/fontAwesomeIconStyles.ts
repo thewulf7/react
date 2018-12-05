@@ -11,7 +11,7 @@ const brand = (content: string) => fontIcon(content, 'brand-icons')
 // Originally generated from:
 // https://github.com/Semantic-Org/Semantic-UI-CSS/blob/master/components/icon.css
 // Corrections were made to duplicate icon names and incorrectly mapped alternates
-const fontAwesomeIcons: ThemeIcons = {
+export const fontAwesomeIcons: ThemeIcons = {
   // Deprecated *In/Out Naming Conflict)
   'linkedin in': brand('f0e1'),
   'zoom in': normal('f00e'),
