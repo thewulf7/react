@@ -270,13 +270,8 @@ class Sidebar extends React.Component<any, any> {
                   >
                     Chat message with popover
                   </Menu.Item>
-                  <Menu.Item
-                    as={NavLink}
-                    exact
-                    to="/prototype-async-dropdown-search"
-                    activeClassName="active"
-                  >
-                    Async Dropdown Search
+                  <Menu.Item as={NavLink} exact to="/prototype-dropdowns" activeClassName="active">
+                    Dropdowns
                   </Menu.Item>
                   <Menu.Item
                     as={NavLink}
