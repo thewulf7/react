@@ -62,6 +62,9 @@ export interface DropdownProps extends UIComponentProps<DropdownProps, DropdownS
   /** The initial value for the index of the currently active selected item, in a multiple selection. */
   defaultActiveSelectedIndex?: number
 
+  /** Initial value for 'open'. */
+  defaultOpen?: boolean
+
   /** The initial value for the search query, if the dropdown is also a search. */
   defaultSearchQuery?: string
 
@@ -131,6 +134,9 @@ export interface DropdownProps extends UIComponentProps<DropdownProps, DropdownS
    */
   onSelectedChange?: ComponentEventHandler<DropdownProps>
 
+  /** Defines whether dropdown is displayed. */
+  open?: boolean
+
   /** A placeholder message for the input field. */
   placeholder?: string
 
@@ -175,7 +181,7 @@ export interface DropdownState {
   activeSelectedIndex: number
   defaultHighlightedIndex: number
   focused: boolean
-  isOpen?: boolean
+  open?: boolean
   searchQuery?: string
   value: ShorthandValue | ShorthandCollection
 }
@@ -206,6 +212,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
     clearable: PropTypes.bool,
     clearIndicator: customPropTypes.itemShorthand,
     defaultActiveSelectedIndex: PropTypes.number,
+    defaultOpen: PropTypes.bool,
     defaultSearchQuery: PropTypes.string,
     defaultValue: PropTypes.oneOfType([
       customPropTypes.itemShorthand,
@@ -224,6 +231,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
     noResultsMessage: customPropTypes.itemShorthand,
     onSearchQueryChange: PropTypes.func,
     onSelectedChange: PropTypes.func,
+    open: PropTypes.bool,
     placeholder: PropTypes.string,
     renderItem: PropTypes.func,
     renderSelectedItem: PropTypes.func,
@@ -254,7 +262,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
     triggerButton: {},
   }
 
-  static autoControlledProps = ['activeSelectedIndex', 'searchQuery', 'value']
+  static autoControlledProps = ['activeSelectedIndex', 'open', 'searchQuery', 'value']
 
   static Item = DropdownItem
   static SearchInput = DropdownSearchInput
@@ -266,6 +274,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
       // used on single selection to open the dropdown with the selected option as highlighted.
       defaultHighlightedIndex: this.props.multiple ? undefined : null,
       focused: false,
+      open: false,
       searchQuery: search ? '' : undefined,
       value: multiple ? [] : null,
     }
@@ -288,11 +297,12 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
       itemToString,
       toggleIndicator,
     } = this.props
-    const { defaultHighlightedIndex, searchQuery, value } = this.state
+    const { defaultHighlightedIndex, open, searchQuery, value } = this.state
 
     return (
       <ElementType className={classes.root} {...unhandledProps}>
         <Downshift
+          isOpen={open}
           onChange={this.handleSelectedChange}
           inputValue={search ? searchQuery : null}
           stateReducer={this.handleDownshiftStateChanges}
@@ -308,7 +318,6 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
             getMenuProps,
             getRootProps,
             getToggleButtonProps,
-            isOpen,
             toggleMenu,
             highlightedIndex,
             selectItemAtIndex,
@@ -323,7 +332,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
               <Ref innerRef={innerRef}>
                 <div
                   className={cx(Dropdown.slotClassNames.container, classes.container)}
-                  onClick={search && !isOpen ? this.handleContainerClick : undefined}
+                  onClick={search && !open ? this.handleContainerClick : undefined}
                 >
                   <div
                     ref={this.selectedItemsRef}
@@ -357,7 +366,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
                       })
                     : Indicator.create(toggleIndicator, {
                         defaultProps: {
-                          direction: isOpen ? 'top' : 'bottom',
+                          direction: open ? 'top' : 'bottom',
                           styles: styles.toggleIndicator,
                         },
                         overrideProps: (predefinedProps: IndicatorProps) => ({
@@ -370,7 +379,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
                   {this.renderItemsList(
                     styles,
                     variables,
-                    isOpen,
+                    open,
                     highlightedIndex,
                     toggleMenu,
                     selectItemAtIndex,
@@ -461,7 +470,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
   private renderItemsList(
     styles: ComponentSlotStylesInput,
     variables: ComponentVariablesInput,
-    isOpen: boolean,
+    open: boolean,
     highlightedIndex: number,
     toggleMenu: () => void,
     selectItemAtIndex: (index: number) => void,
@@ -504,8 +513,8 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
           {...accessibilityMenuProps}
           styles={styles.list}
           tabIndex={search ? undefined : -1} // needs to be focused when trigger button is activated.
-          aria-hidden={!isOpen}
-          items={isOpen ? this.renderItems(styles, variables, getItemProps, highlightedIndex) : []}
+          aria-hidden={!open}
+          items={open ? this.renderItems(styles, variables, getItemProps, highlightedIndex) : []}
         />
       </Ref>
     )
@@ -606,8 +615,8 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
   }
 
   private handleStateChange = (changes: StateChangeOptions<ShorthandValue>) => {
-    if (changes.isOpen !== undefined && changes.isOpen !== this.state.isOpen) {
-      this.setState({ isOpen: changes.isOpen })
+    if (changes.isOpen !== undefined && changes.isOpen !== this.state.open) {
+      this.setState({ open: changes.isOpen })
     }
 
     if (changes.isOpen && !this.props.search) {

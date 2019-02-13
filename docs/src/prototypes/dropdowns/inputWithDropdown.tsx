@@ -84,6 +84,7 @@ class InputWithDropdownExample extends React.Component<{}, InputWithDropdownStat
           items={atMentionItems}
           toggleIndicator={null}
           // inputRef={this.setInputNode}
+          searchInput={{ input: { autoFocus: true } }}
           inputRef={this.inputRef}
           noResultsMessage="We couldn't find any matches."
         />
