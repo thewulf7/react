@@ -94,6 +94,9 @@ export interface DropdownProps extends UIComponentProps<DropdownProps, DropdownS
   /** A dropdown can be formatted to appear inline in the content of other components. */
   inline?: boolean
 
+  /** Ref for input DOM node. */
+  inputRef?: React.RefObject<HTMLInputElement>
+
   /** Array of props for generating list options (Dropdown.Item[]) and selected item labels(Dropdown.SelectedItem[]), if it's a multiple selection. */
   items?: ShorthandCollection
 
@@ -185,7 +188,6 @@ export interface DropdownState {
  */
 class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, DropdownState> {
   private buttonRef = React.createRef<HTMLElement>()
-  private inputRef = React.createRef<HTMLInputElement>()
   private listRef = React.createRef<HTMLElement>()
   private selectedItemsRef = React.createRef<HTMLDivElement>()
 
@@ -213,6 +215,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
     getA11ySelectionMessage: PropTypes.object,
     getA11yStatusMessage: PropTypes.func,
     inline: PropTypes.bool,
+    inputRef: customPropTypes.ref,
     items: customPropTypes.collectionShorthand,
     itemToString: PropTypes.func,
     loading: PropTypes.bool,
@@ -238,6 +241,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
   static defaultProps: DropdownProps = {
     as: 'div',
     clearIndicator: 'close',
+    inputRef: React.createRef<HTMLInputElement>(),
     itemToString: item => {
       if (!item || React.isValidElement(item)) {
         return ''
@@ -429,7 +433,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
     ) => void,
     variables,
   ): JSX.Element {
-    const { inline, searchInput, multiple, placeholder } = this.props
+    const { inline, inputRef, searchInput, multiple, placeholder } = this.props
     const { searchQuery, value } = this.state
 
     const noPlaceholder =
@@ -440,7 +444,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
         placeholder: noPlaceholder ? '' : placeholder,
         inline,
         variables,
-        inputRef: this.inputRef,
+        inputRef,
       },
       overrideProps: (predefinedProps: DropdownSearchInputProps) =>
         this.handleSearchInputOverrides(
@@ -766,7 +770,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
   private trySetLastSelectedItemAsActive = () => {
     if (
       !this.props.multiple ||
-      (this.inputRef.current && this.inputRef.current.selectionStart !== 0)
+      (this.props.inputRef.current && this.props.inputRef.current.selectionStart !== 0)
     ) {
       return
     }
@@ -782,7 +786,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
 
     if (
       multiple &&
-      (searchQuery === '' || this.inputRef.current.selectionStart === 0) &&
+      (searchQuery === '' || this.props.inputRef.current.selectionStart === 0) &&
       (value as ShorthandCollection).length > 0
     ) {
       this.removeItemFromValue()
@@ -913,7 +917,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
             })
             if (this.props.search) {
               e.preventDefault() // prevents caret to forward one position in input.
-              this.inputRef.current.focus()
+              this.props.inputRef.current.focus()
             } else {
               this.buttonRef.current.focus()
             }
@@ -971,7 +975,7 @@ class Dropdown extends AutoControlledComponent<Extendable<DropdownProps>, Dropdo
 
   private tryFocusSearchInput = () => {
     if (this.props.search) {
-      this.inputRef.current.focus()
+      this.props.inputRef.current.focus()
     }
   }
 

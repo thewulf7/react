@@ -4,9 +4,11 @@ import * as _ from 'lodash'
 import keyboardKey from 'keyboard-key'
 import { Provider, Box, Dropdown, themes } from '@stardust-ui/react'
 
-import ContentEditable from './ContentEditable'
+// import ContentEditable from './ContentEditable'
+import { SimpleContentEditable } from './ContentEditable'
 import { atMentionItems } from './dataMocks'
-import { createNodeWithIdAtCaretPosition } from './utils'
+// import { insertNodeAtCursorPosition } from './utils'
+import { insertNodeAtCursorPositionSimple as insertNodeAtCursorPosition } from './utils'
 
 interface InputWithDropdownState {
   dropdownOpen?: boolean
@@ -15,7 +17,8 @@ interface InputWithDropdownState {
 
 class InputWithDropdownExample extends React.Component<{}, InputWithDropdownState> {
   private readonly mountNodeId = 'dropdown-mount-node'
-  private contentEditableRef = React.createRef<HTMLDivElement>()
+  private inputRef = React.createRef<HTMLInputElement>()
+  private contentEditableRef = React.createRef<HTMLElement>()
 
   public state: InputWithDropdownState = {
     dropdownOpen: false,
@@ -30,14 +33,14 @@ class InputWithDropdownExample extends React.Component<{}, InputWithDropdownStat
           padding: '10px',
         })}
       >
-        <ContentEditable
-          innerRef={this.contentEditableRef}
-          html={this.state.inputValue}
+        <SimpleContentEditable
+          ref={this.contentEditableRef as any}
+          // html={this.state.inputValue}
           onChange={this.handleChange}
-          onKeyDown={this.handleKeyDown}
-          onKeyUp={() => this.logCaretPosition('onKeyUp')}
-          onClick={() => this.logCaretPosition('onClick')}
-          onFocus={() => this.logCaretPosition('onFocus')}
+          onKeyUp={this.handleKeyUp}
+          // onKeyUp={() => this.logCaretPosition('onKeyUp')}
+          // onClick={() => this.logCaretPosition('onClick')}
+          // onFocus={() => this.logCaretPosition('onFocus')}
         />
       </Box>
     )
@@ -46,14 +49,14 @@ class InputWithDropdownExample extends React.Component<{}, InputWithDropdownStat
   private handleChange = (e: React.SyntheticEvent<HTMLElement>) => {
     const html = _.get(e, 'target.value')
     console.log('handleChange html: ', html)
-    this.logCaretPosition('handleChange')
-
-    this.setState({ inputValue: html })
+    // this.logCaretPosition('handleChange')
+    // this.setState({ inputValue: html })
   }
 
-  private handleKeyDown = (e: React.KeyboardEvent) => {
-    this.logCaretPosition('handleKeyDown')
+  private handleKeyUp = (e: React.KeyboardEvent) => {
+    // this.logCaretPosition('handleKeyUp')
     const code = keyboardKey.getCode(e)
+    console.log('handleKeyUp key: ', String.fromCharCode(code))
     switch (code) {
       case keyboardKey.AtSign: // @
         // this.setState({ dropdownOpen: true })
@@ -69,16 +72,19 @@ class InputWithDropdownExample extends React.Component<{}, InputWithDropdownStat
   }
 
   private showDropdown = () => {
-    createNodeWithIdAtCaretPosition(this.mountNodeId)
+    insertNodeAtCursorPosition(this.mountNodeId)
 
     const node = this.getMountNode()
     ReactDOM.render(
       <Provider theme={themes.teams}>
         <Dropdown
+          defaultOpen={true}
           inline
           search
           items={atMentionItems}
           toggleIndicator={null}
+          // inputRef={this.setInputNode}
+          inputRef={this.inputRef}
           noResultsMessage="We couldn't find any matches."
         />
       </Provider>,
@@ -90,6 +96,8 @@ class InputWithDropdownExample extends React.Component<{}, InputWithDropdownStat
     // TODO: find and destroy element with id this.mountNodeId
     ReactDOM.unmountComponentAtNode(this.getMountNode())
   }
+
+  // private setInputNode = (node: HTMLElement) => (this.inputNode = node)
 
   private getMountNode = () => document.getElementById(this.mountNodeId)
 

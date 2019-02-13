@@ -33,7 +33,47 @@ export const normalizeHtml = (str: string): string => {
   return str && str.replace(/&nbsp|\u202F|\u00A0/g, ' ')
 }
 
-export const createNodeWithIdAtCaretPosition = (id: string) => {
+export const insertNodeAtCursorPositionSimple = (id: string) => {
+  if (!window.getSelection) {
+    return
+  }
+
+  const sel = window.getSelection()
+  if (!sel.getRangeAt || !sel.rangeCount) {
+    return
+  }
+
+  const range = sel.getRangeAt(0)
+  // range.deleteContents()
+
+  // Range.createContextualFragment() would be useful here but is
+  // non-standard and not supported in all browsers (IE9, for one)
+  const elem = document.createElement('span')
+  // const container = document.createElement('div')
+  elem.id = id
+  // container.appendChild(elem)
+
+  // const frag = document.createDocumentFragment()
+  // let node: Node
+  // let lastNode: Node
+
+  // while ((node = container.firstChild)) {
+  //   lastNode = frag.appendChild(node)
+  // }
+
+  range.insertNode(elem)
+
+  // Preserve the selection
+  // if (lastNode) {
+  //   range = range.cloneRange()
+  //   range.setStartAfter(lastNode)
+  //   range.collapse(true)
+  //   sel.removeAllRanges()
+  //   sel.addRange(range)
+  // }
+}
+
+export const insertNodeAtCursorPosition = (id: string) => {
   if (!window.getSelection) {
     return
   }

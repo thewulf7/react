@@ -1,36 +1,94 @@
 import * as React from 'react'
-import * as _ from 'lodash'
 import * as PropTypes from 'prop-types'
+import * as _ from 'lodash'
 
 import { replaceCaret } from './utils'
 import { Extendable } from 'src/types'
 
 type EventHandler = (e: React.SyntheticEvent<HTMLElement>) => void
 
-export interface Props {
+export interface SimpleContentEditableProps {
+  html?: string
+  onChange?: EventHandler
+  onBlur?: EventHandler
+  onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void
+}
+
+export class SimpleContentEditable extends React.Component<Extendable<SimpleContentEditableProps>> {
+  private lastHtml: string = this.props.html
+  private ref = React.createRef<HTMLDivElement>()
+
+  static propTypes = {
+    html: PropTypes.string.isRequired,
+    onChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    onKeyDown: PropTypes.func,
+  }
+
+  render() {
+    const { children, html, ...props } = this.props
+
+    return (
+      <div
+        {...props}
+        contentEditable
+        dangerouslySetInnerHTML={{ __html: html }}
+        ref={this.ref}
+        onInput={e => this.handleEvent(e, 'onInput')}
+        onBlur={e => this.handleEvent(e, 'onBlur')}
+        onKeyDown={e => this.handleEvent(e, 'onKeyDown')}
+        onKeyUp={e => this.handleEvent(e, 'onKeyUp')}
+      >
+        {children}
+      </div>
+    )
+  }
+
+  shouldComponentUpdate(): boolean {
+    return false
+  }
+
+  private handleEvent = (event: React.SyntheticEvent<HTMLElement>, eventName: string) => {
+    _.invoke(this.props, eventName, event, this.props)
+    this.emitChange(event)
+  }
+
+  private emitChange = (event: React.SyntheticEvent<HTMLElement>) => {
+    if (!this.ref) {
+      return
+    }
+
+    const html = this.ref.current.innerHTML
+    if (this.props.onChange && html !== this.lastHtml) {
+      this.props.onChange(Object.assign({}, event, { target: { value: html } }))
+    }
+
+    this.lastHtml = html
+  }
+}
+
+export interface ContentEditableProps {
   html?: string
   onChange?: EventHandler
   onBlur?: EventHandler
   onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void
   disabled?: boolean
-  tagName?: string
-  className?: string
-  style?: Object
+  as?: string
   innerRef?: React.RefObject<HTMLElement> | Function
 }
 
 /**
  * A simple component for an html element with editable contents.
  */
-class ContentEditable extends React.Component<Extendable<Props>> {
+class ContentEditable extends React.Component<Extendable<ContentEditableProps>> {
   private lastHtml: string = this.props.html
-  private el: React.RefObject<HTMLElement> =
+  private element: React.RefObject<HTMLElement> =
     typeof this.props.innerRef === 'function' ? { current: null } : React.createRef<HTMLElement>()
 
   private getEl = () =>
     (this.props.innerRef && typeof this.props.innerRef !== 'function'
       ? this.props.innerRef
-      : this.el
+      : this.element
     ).current
 
   static propTypes = {
@@ -39,26 +97,28 @@ class ContentEditable extends React.Component<Extendable<Props>> {
     onBlur: PropTypes.func,
     onKeyDown: PropTypes.func,
     disabled: PropTypes.bool,
-    tagName: PropTypes.string,
-    className: PropTypes.string,
-    style: PropTypes.object,
+    as: PropTypes.string,
     innerRef: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
   }
 
+  static defaultProps: ContentEditableProps = {
+    as: 'div',
+  }
+
   render() {
-    const { tagName, html, innerRef, ...props } = this.props
+    const { as, html, innerRef, ...props } = this.props
 
     return React.createElement(
-      tagName || 'div',
+      as || 'div',
       {
         ...props,
         ref:
           typeof innerRef === 'function'
             ? (current: HTMLElement) => {
                 innerRef(current)
-                ; (this.el as any).current = current
+                ; (this.element as any).current = current
               }
-            : innerRef || this.el,
+            : innerRef || this.element,
         onInput: this.emitChange,
         onBlur: this.props.onBlur || this.emitChange,
         onKeyDown: this.props.onKeyDown || this.emitChange,
@@ -69,7 +129,7 @@ class ContentEditable extends React.Component<Extendable<Props>> {
     )
   }
 
-  shouldComponentUpdate(nextProps: Props): boolean {
+  shouldComponentUpdate(nextProps: ContentEditableProps): boolean {
     const props = this.props
     const el = this.getEl()
     if (!el) return true
@@ -82,10 +142,8 @@ class ContentEditable extends React.Component<Extendable<Props>> {
     // Handle additional properties
     const should =
       props.disabled !== nextProps.disabled ||
-      props.tagName !== nextProps.tagName ||
-      props.className !== nextProps.className ||
-      props.innerRef !== nextProps.innerRef ||
-      !_.isEqual(props.style, nextProps.style)
+      props.as !== nextProps.as ||
+      props.innerRef !== nextProps.innerRef
 
     return should
   }
