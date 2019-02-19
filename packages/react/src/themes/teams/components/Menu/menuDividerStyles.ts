@@ -8,7 +8,7 @@ const menuDividerStyles: ComponentSlotStylesInput<MenuDividerProps, MenuVariable
     const borderType = p.vertical ? 'borderTop' : 'borderLeft'
 
     return {
-      [borderType]: `1px solid ${borderColor}`,
+      [borderType]: `${v.menuBorderWidth} solid ${borderColor}`,
       ...(!p.vertical && {
         alignSelf: 'stretch',
       }),
