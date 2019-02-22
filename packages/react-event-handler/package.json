@@ -1,0 +1,33 @@
+{
+  "name": "@stardust-ui/react-event-handler",
+  "version": "0.21.1",
+  "description": "--- TODO ---",
+  "license": "MIT",
+  "author": "Oleksandr Fediashov <a@fedyashov.com>",
+  "homepage": "https://github.com/stardust-ui/react-event-handler#readme",
+  "bugs": {
+    "url": "https://github.com/stardust-ui/react/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://github.com/stardust-ui/react.git"
+  },
+  "jsnext:main": "dist/es/index.js",
+  "main": "dist/commonjs/index.js",
+  "module": "dist/es/index.js",
+  "types": "dist/es/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "gulp bundle:package:no-umd --package react-event-handler"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
