@@ -15,4 +15,7 @@ module.exports = {
     'src/(.*)$': `<rootDir>/packages/react/src/$1`,
     'test/(.*)$': `<rootDir>/packages/react/test/$1`,
   },
+  transform: {
+    '^.+\\.tsx?$': `${__dirname}/jest.transform.js`,
+  },
 }
