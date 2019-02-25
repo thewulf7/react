@@ -47,7 +47,6 @@ class Grid extends UIComponent<ReactProps<GridProps>, any> {
     ...commonPropTypes.createCommon({
       content: false,
     }),
-    accessibility: PropTypes.func,
     columns: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     content: customPropTypes.every([
       customPropTypes.disallow(['children']),
@@ -65,6 +64,7 @@ class Grid extends UIComponent<ReactProps<GridProps>, any> {
   }
 
   public renderComponent({
+    accessibility,
     ElementType,
     classes,
     unhandledProps,
@@ -75,6 +75,7 @@ class Grid extends UIComponent<ReactProps<GridProps>, any> {
       <ElementType
         className={classes.root}
         {...rtlTextContainer.getAttributes({ forElements: [children, content] })}
+        {...accessibility.attributes.root}
         {...unhandledProps}
       >
         {childrenExist(children) ? children : content}
