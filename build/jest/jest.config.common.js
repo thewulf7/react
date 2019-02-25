@@ -6,7 +6,7 @@ module.exports = {
   coverageReporters: ['json', 'lcov'],
   testRegex: '/test/.*-test\\.tsx?$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
-  setupFilesAfterEnv: [`${__dirname}/setup.common.ts`],
+  setupFilesAfterEnv: [`${__dirname}/setup.common.js`],
   moduleNameMapper: {
     ...lernaAliases(),
     'docs/(.*)$': `<rootDir>/docs/$1`,
